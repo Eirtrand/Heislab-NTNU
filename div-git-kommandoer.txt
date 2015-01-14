@@ -7,7 +7,7 @@ Sjekke om alt ok:
 git status
 klargjøre/legge til FIL.txt til git:
 git add FIL.txt
-se om dette gaar gjennom
+se om dette gaar gjennom endring
 
 
 
