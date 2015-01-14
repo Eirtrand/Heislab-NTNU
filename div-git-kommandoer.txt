@@ -9,5 +9,8 @@ git push -u origin master
 Sjekke om alt ok:
 git status
 
-klargjøre/legge til FIL.txt til git:
+legge til FIL.txt til git:
 git add FIL.txt
+
+commite filen:
+git commit 
