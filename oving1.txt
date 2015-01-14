@@ -10,6 +10,8 @@ And how can it make programming more difficult?
 
 Task 4:
 What are the differences between processes, threads, green threads, and coroutines?
+- Process: OS-managed (possibly) truly concurrent, at least in the presence of suitable hardware support. Exist within their 
+own address space.
 - Thread: OS-managed, within the same address space as the parent and all its other threads. Possibly truly concurrent, and 
 multi-tasking is pre-emptive.
 - Green Thread: These are user-space projections of the same concept as threads, but are not OS-managed. Probably not truly 
