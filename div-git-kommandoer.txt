@@ -13,4 +13,4 @@ legge til FIL.txt til git:
 git add FIL.txt
 
 commite filen:
-git commit 
+git commit -m "your comment"
