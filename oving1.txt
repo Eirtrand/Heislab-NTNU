@@ -5,7 +5,7 @@ Why do we use concurrent execution (multithreading/multiprocessing, or the like)
 - 	 utnytte moderne cpuer som har flere tråder
 
 How can adding more concurrent tasks make programming simpler? 
-
+-Gjør sanntidsprogging enklere
 And how can it make programming more difficult? 
 
 Task 4:
