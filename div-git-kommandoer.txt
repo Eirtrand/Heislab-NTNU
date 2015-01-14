@@ -1,13 +1,16 @@
 Diverse gitkommandoer:
 Laste ned:
 git pull
-Laste opp:
-git push origin -u origin master
-Sjekke om alt ok:
-git status
+
 klargjøre/legge til FIL.txt til git:
 git add FIL.txt
-se om dette gaar gjennom endring
 
+Sjekke om alt ok:
+git status
 
+Dersom status er OK:
+git commit -m "Kommentar på endring"
+
+Laste opp:
+git push origin -u origin master
 
