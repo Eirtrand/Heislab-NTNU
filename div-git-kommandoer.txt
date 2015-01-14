@@ -4,7 +4,7 @@ Laste ned:
 git pull
 
 Laste opp:
-git push origin -u origin master
+git push -u origin master
 
 Sjekke om alt ok:
 git status
