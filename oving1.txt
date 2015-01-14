@@ -7,3 +7,6 @@ Why do we use concurrent execution (multithreading/multiprocessing, or the like)
 How can adding more concurrent tasks make programming simpler? 
 
 And how can it make programming more difficult? 
+
+Task 4:
+What are the differences between processes, threads, green threads, and coroutines?
