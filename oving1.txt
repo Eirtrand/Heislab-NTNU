@@ -18,3 +18,7 @@ multi-tasking is pre-emptive.
 concurrent, except in the sense that there may be multiple worker threads or processes giving them CPU time concurrently, 
 so probably best to consider this as interleaved or multiplexed.
 - Coroutines: Not OS-managed. Exactly threads, except co-operatively multitasking, and hence not truly concurrent.
+
+C = threads
+Python = green threads
+Golang = cocoroutines
