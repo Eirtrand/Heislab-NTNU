@@ -1,4 +1,5 @@
 Diverse gitkommandoer:
+<<<<<<< HEAD
 
 Laste ned:
 git pull
@@ -14,3 +15,17 @@ git add FIL.txt
 
 commite filen:
 git commit -m "your comment"
+=======
+Laste ned:
+git pull
+Laste opp:
+git push origin -u origin master
+Sjekke om alt ok:
+git status
+klargjøre/legge til FIL.txt til git:
+git add FIL.txt
+se om dette gaar gjennom
+
+
+
+>>>>>>> 963f74f54ab9088e9da8a0304e8013a5beb73588
