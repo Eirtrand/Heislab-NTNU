@@ -19,6 +19,14 @@ concurrent, except in the sense that there may be multiple worker threads or pro
 so probably best to consider this as interleaved or multiplexed.
 - Coroutines: Not OS-managed. Exactly threads, except co-operatively multitasking, and hence not truly concurrent.
 
-C = threads
-Python = green threads
-Golang = cocoroutines
+- C = threads
+  Python = green threads
+  Golang = cocoroutines
+
+- Because of the Global Interpreter Lock (GIL), a python process only runs one thread at a time.
+
+What does func GOMAXPROCS(n int) int change?
+- GOMAXPROCS sets the maximum number of CPUs that can be executing simultaneously and returns the previous setting. 
+If n < 1, it does not change the current setting. The number of logical CPUs on the local machine can be queried with NumCPU. 
+This call will go away when the scheduler improves.
+
