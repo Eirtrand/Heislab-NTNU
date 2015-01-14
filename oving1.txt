@@ -1,0 +1,9 @@
+Task 3:
+
+Why do we use concurrent execution (multithreading/multiprocessing, or the like)? List a fair few reasons.
+-	 Virtually all real-time systems are inherently concurrent devices operate in parallel in the real world
+
+
+How can adding more concurrent tasks make programming simpler? 
+
+And how can it make programming more difficult? 
