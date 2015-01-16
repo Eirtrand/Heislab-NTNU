@@ -13,3 +13,21 @@ git commit -m "Kommentar på endring"
 
 Laste opp:
 git push origin -u origin master
+
+Se endringer (bra en person):
+git log (--author="neweirik")
+
+Se hva som er endret:
+git diff
+
+Se "staged" endringer:
+git diff --staged
+
+Legg til alle filer:
+git add .
+
+Slett fil:
+git rm slettdette.c
+
+
+
