@@ -17,7 +17,7 @@ return NULL;
 }
 
 void* someThreadFunction2(){
-for(int k = 0;k<1000000;k++){
+for(int k = 0;k<1000001;k++){
 	pthread_mutex_lock(&lock);
 	i--;
 	pthread_mutex_unlock(&lock);
