@@ -1,23 +1,25 @@
 # Python 3.3.3 and 2.7.6
 # python helloworld_python.py
 
-from threading import Thread
+from threading import Thread, Lock
 
 i = 0
+mutex = Lock()
 
 def someThreadFunction1():
-        
-        global i
-        for x in range(0,1000000):
-                i += 1
-    	
+    global i
+    for x in range(0,1000000):
+        mutex.acquire()
+        i += 1
+        mutex.release()
         
 
 def someThreadFunction2():
-        global i
-        for y in range(0,1000000):
-                i -= 1
-
+    global i
+    for y in range(0,1000001):
+        mutex.acquire()
+        i -= 1
+        mutex.release()
 
 
 def main():
