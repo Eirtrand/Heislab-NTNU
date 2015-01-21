@@ -1,4 +1,4 @@
-Atomic operation:
+﻿Atomic operation:
 en operasjon der en prosessor kan lese av et område og skrive i samme bus operasjon
 atomic betyr at operasjonen må fullføres 100% eller ikke i det hele tatt
 
@@ -11,3 +11,5 @@ forbruker må vente på sin tur
 
 Critical section:
 Del av koden som har delt ressurs, som kun må kunne håndteres av en tråd om gangen
+
+Ny endring
