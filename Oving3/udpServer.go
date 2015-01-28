@@ -8,9 +8,9 @@ import (
 
 func main() {
 
-        port := "129.241.187.136:30000"
+        port := "129.241.187.136:20006"
 
-        udpAddress, err := net.ResolveUDPAddr("udp4",":30000")
+        udpAddress, err := net.ResolveUDPAddr("udp",":20006")
 
         if err != nil {
                 fmt.Println("error resolving UDP address on ", port)
