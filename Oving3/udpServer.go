@@ -3,10 +3,17 @@ package main
 import (
 "fmt"
 "net"
-///"time"
+
+"encoding/json"
 )
 
 func main() {
+
+type statusMessage struct {
+				State	string
+                CurrentFloor	int
+                
+        }
 
         port := "129.241.187.136:20006"
 
@@ -29,10 +36,10 @@ func main() {
         defer conn.Close()
 
         var buf [1024]byte
-
+        var elevMsg statusMessage
         for {
 
-                //time.Sleep(1000 * time.Millisecond)
+                
 
                 n,address, err := conn.ReadFromUDP(buf[0:])
 
@@ -45,10 +52,18 @@ func main() {
                 if address != nil {
 
                         fmt.Println("got message from ", address, " with n = ", n)
-
+                        fmt.Println("Raw message:", buf[0:n])
                         if n> 0 {
-                                fmt.Println("from address", address, "got message:", string(buf[0:n]), n)
+                        		err := json.Unmarshal(buf[0:n], &elevMsg)
+                        		 if err != nil {
+                        				fmt.Println("error reading data from connection")
+                        				fmt.Println(err)
+                        		return
+                }
+                                fmt.Println(elevMsg.State)
+                        		fmt.Printf("%+v",elevMsg)
                         }
+
                 }
         }
 

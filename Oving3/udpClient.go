@@ -3,12 +3,29 @@ package main
 import (
 "fmt"
 "net"
-"os"
+ "os"
 "time"
+"encoding/json"
 )
+
 
 func main() {
 
+        type statusMessage struct {
+                State     string
+                CurrentFloor    int
+                
+        }
+        elevator1 := statusMessage{
+                State:     "IDLE",
+                CurrentFloor:   4,        
+        }
+
+        b, err := json.Marshal(elevator1)
+        if err != nil {
+                fmt.Println("error:", err)
+        }
+        os.Stdout.Write(b)
         if len(os.Args) != 2{
                 fmt.Fprintf(os.Stderr, "Usage:%s host:port", os.Args[0])
                 os.Exit(1)
@@ -37,7 +54,7 @@ func main() {
         for {
 
                 time.Sleep(1000*time.Millisecond)
-                n, err := conn.Write([]byte("Eirik og Alex labplass 6 \n"))
+                n, err := conn.Write([]byte(b))
                 if err != nil {
                         fmt.Println("error writing data to server", service)
                         fmt.Println(err)
