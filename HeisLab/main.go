@@ -1,9 +1,10 @@
 package main
 
 import (
-	"fmt"
+	//"fmt"
+	. "./elevator"
 )
 
 func main() {
-	fsm()
+	Fsm()
 }
