@@ -15,9 +15,9 @@ type statusMessage struct {
                 
         }
 
-        port := "129.241.187.255:2000"
+        port := "129.241.187.255:20006"
 
-        udpAddress, err := net.ResolveUDPAddr("udp",":2000")
+        udpAddress, err := net.ResolveUDPAddr("udp",":20006")
 
         if err != nil {
                 fmt.Println("error resolving UDP address on ", port)
@@ -41,7 +41,7 @@ type statusMessage struct {
 
                 
 
-                n,address, err := conn.ReadFromUDP(buf[0:])
+                n,address, err := conn.ReadFromUDP(buf[11:])
 
                 if err != nil {
                         fmt.Println("error reading data from connection")
