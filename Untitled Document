@@ -1,0 +1,19 @@
+package main
+
+import(
+"fmt"
+)
+
+add_channel(){
+		my_channel := make(chan int)
+		my_channel <- 5
+	}
+
+var my_recvd_value int
+func main() {
+	add_channel()
+
+	my_recvd_value = <- my_channel
+	fmt.Println(my_recvd_value)
+
+}

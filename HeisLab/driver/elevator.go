@@ -2,6 +2,7 @@ package driver
 
 //import "fmt"
 
+
 const n_BUTTONS int = 3
 const n_FLOORS int = 4
 
@@ -30,7 +31,6 @@ func initialize_elevator() int {
 func poll_all_signals() {
 	for {
 		Get_floor_sensor_signal()
-		get_button_signals()
 
 		
 	}
@@ -51,20 +51,26 @@ func Get_floor_sensor_signal() int{
 	}
 }
 
-func get_button_signals() {
-	
+func Elev_set_door_open_lamp(value int) {
+	if value == 1{
+		Set_bit(LIGHT_DOOR_OPEN)
+	}else{
+		Clear_bit(LIGHT_DOOR_OPEN)
+	}
 }
 
-/*func power_off_all_lamps(){ 
+/*
+func power_off_all_lamps(){ 
 	for i := 0; i<n_FLOORS; i++	{
 		if i != 0 {
-			elev_set_button_lamp(BUTTON_CALL_DOWN, i, 0)
+			C.elev_set_button_lamp(BUTTON_CALL_DOWN, i, 0)
 		}
 
 		if i != n_FLOORS - 1 {
-			elev_set_button_lamp(BUTTON_CALL_UP, i, 0)
+			C.elev_set_button_lamp(BUTTON_CALL_UP, i, 0)
 		}
 
-		elev_set_button_lamp(BUTTON_COMMAND, i, 0)
+		C.elev_set_button_lamp(BUTTON_COMMAND, i, 0)
 	}
-} */
+} 
+*/

@@ -1,10 +1,11 @@
 package driver
-
 /*
+#cgo CFLAGS: -std=c99
 #cgo LDFLAGS: -lcomedi -lm
 #include "io.h"
 */
 import "C"
+import "fmt"
 
 func Init() bool {
 	return bool(int(C.io_init()) != 1)
@@ -23,7 +24,9 @@ func Write_analog(channel, value int) {
 }
 
 func Read_bit(channel int) bool {
-	return int(C.io_read_bit(C.int(channel))) != 0
+	temp := int(C.io_read_bit(C.int(channel)))
+	fmt.Println("temp:",temp)
+	return temp != 0
 }
 
 func Read_analog(channel int) int {

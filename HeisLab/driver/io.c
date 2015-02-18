@@ -15,7 +15,7 @@ static comedi_t *it_g = NULL;
 
 
 
-int io_init() {
+int __attribute__((constructor)) io_init() {
     int i = 0;
     int status = 0;
 
@@ -57,7 +57,6 @@ void io_write_analog(int channel, int value) {
 int io_read_bit(int channel) {
     unsigned int data = 0;
     comedi_dio_read(it_g, channel >> 8, channel & 0xff, &data);
-
     return (int)data;
 }
 
