@@ -1,76 +1,187 @@
 package driver
 
-//import "fmt"
-
+import("fmt"
+	"time"
+) 
 
 const n_BUTTONS int = 3
 const n_FLOORS int = 4
 
- var lamp_channel_matrix = [n_FLOORS][n_BUTTONS] int{
-    {LIGHT_UP1, LIGHT_DOWN1, LIGHT_COMMAND1},
-    {LIGHT_UP2, LIGHT_DOWN2, LIGHT_COMMAND2},
-    {LIGHT_UP3, LIGHT_DOWN3, LIGHT_COMMAND3},
-    {LIGHT_UP4, LIGHT_DOWN4, LIGHT_COMMAND4},
+type Direction int
+type State int
+var elev elevator
+
+
+const (
+	NONE Direction = iota
+	UP 
+	DOWN 
+)
+
+const (
+	INIT State = iota
+	STOPPED
+ 	GOING_UP
+ 	GOING_DOWN
+	EMERGENCY_STOP
+)
+
+ var external_button_array = [NUMBER_OF_EXT_BUTTONS] int{
+ 	BUTTON_UP1, BUTTON_UP2, BUTTON_UP3 ,BUTTON_DOWN2, BUTTON_DOWN3, BUTTON_DOWN4,
+}
+
+ var internal_button_array = [NUMBER_OF_INT_BUTTONS] int{
+ 	BUTTON_COMMAND1, BUTTON_COMMAND2, BUTTON_COMMAND3, BUTTON_COMMAND4,
+}
+
+type elevator struct {
+	state      State
+	external_button_array []int
+	internal_button_array []int
+	stop bool
+	obstruction bool
 }
 
 
- var buttON_channel_matrix = [n_FLOORS][n_BUTTONS] int{
-    {BUTTON_UP1, BUTTON_DOWN1, BUTTON_COMMAND1},
-    {BUTTON_UP2, BUTTON_DOWN2, BUTTON_COMMAND2},
-    {BUTTON_UP3, BUTTON_DOWN3, BUTTON_COMMAND3},
-    {BUTTON_UP4, BUTTON_DOWN4, BUTTON_COMMAND4},
-}
+func InitializeElevator() int {
 
-func initialize_elevator() int {
 	if !Init() {
+		fmt.Println("init failed")
 		return 0
 	}
+	externalButtonChannel := make(chan int)
+	internalButtonChannel := make(chan int)
+
+	go PollAllButtons(externalButtonChannel, internalButtonChannel)
+	go SortOrders(externalButtonChannel, internalButtonChannel)
+	
+	for GetFloorSensorSignal() == 0{
+		SetMotorDirection(DOWN)
+	}
+
+	SetMotorDirection(NONE)
 	return 1
 }
 
-func poll_all_signals() {
-	for {
-		Get_floor_sensor_signal()
 
-		
-	}
-	
+func PollAllButtons(internalButtonChannel, externalButtonChannel chan int) {
+	for{
+		for i := 0; i<NUMBER_OF_EXT_BUTTONS; i++{
+			if GetButtonSignal(external_button_array[i]) {
+				externalButtonChannel <- external_button_array[i]
+				fmt.Println(external_button_array[i])
+			}
+		}
+		for i := 0; i<NUMBER_OF_INT_BUTTONS; i++{
+			if GetButtonSignal(internal_button_array[i]) {
+				internalButtonChannel <- internal_button_array[i]
+				fmt.Println(internal_button_array[i])
+			}
+		}
+		time.Sleep(time.Millisecond * 18)
+	}	
 }
 
-func Get_floor_sensor_signal() int{
-	if Read_bit(SENSOR_FLOOR1) {
+func GetFloorSensorSignal() int{
+	if ReadBit(SENSOR_FLOOR1) {
 		return 1
-	} else if Read_bit(SENSOR_FLOOR2) {
+	} else if ReadBit(SENSOR_FLOOR2) {
 		return 2
-	} else if Read_bit(SENSOR_FLOOR3) {
+	} else if ReadBit(SENSOR_FLOOR3) {
 		return 3
-	} else if Read_bit(SENSOR_FLOOR4) {
+	} else if ReadBit(SENSOR_FLOOR4) {
 		return 4
 	} else {
 		return 0
 	}
 }
 
-func Elev_set_door_open_lamp(value int) {
+func SetDoorOpenLamp(value int) {
 	if value == 1{
-		Set_bit(LIGHT_DOOR_OPEN)
+		SetBit(LIGHT_DOOR_OPEN)
 	}else{
-		Clear_bit(LIGHT_DOOR_OPEN)
+		ClearBit(LIGHT_DOOR_OPEN)
 	}
 }
 
-/*
-func power_off_all_lamps(){ 
-	for i := 0; i<n_FLOORS; i++	{
-		if i != 0 {
-			C.elev_set_button_lamp(BUTTON_CALL_DOWN, i, 0)
-		}
-
-		if i != n_FLOORS - 1 {
-			C.elev_set_button_lamp(BUTTON_CALL_UP, i, 0)
-		}
-
-		C.elev_set_button_lamp(BUTTON_COMMAND, i, 0)
+func SetLight(floor int, dir Direction) {
+	switch {
+	case floor == 1 && dir == NONE:
+		SetBit(LIGHT_COMMAND1)
+	case floor == 2 && dir == NONE:
+		SetBit(LIGHT_COMMAND2)
+	case floor == 3 && dir == NONE:
+		SetBit(LIGHT_COMMAND3)
+	case floor == 4 && dir == NONE:
+		SetBit(LIGHT_COMMAND4)
+	case floor == 1 && dir == UP:
+		SetBit(LIGHT_UP1)
+	case floor == 2 && dir == UP:
+		SetBit(LIGHT_UP2)
+	case floor == 3 && dir == UP:
+		SetBit(LIGHT_UP3)
+	case floor == 2 && dir == DOWN:
+		SetBit(LIGHT_DOWN2)
+	case floor == 3 && dir == DOWN:
+		SetBit(LIGHT_DOWN3)
+	case floor == 4 && dir == DOWN:
+		SetBit(LIGHT_DOWN4)
 	}
-} 
-*/
+}
+
+func ClearLight(floor int, dir Direction) {
+	switch {
+	case floor == 1 && dir == NONE:
+		ClearBit(LIGHT_COMMAND1)
+	case floor == 2 && dir == NONE:
+		ClearBit(LIGHT_COMMAND2)
+	case floor == 3 && dir == NONE:
+		ClearBit(LIGHT_COMMAND3)
+	case floor == 4 && dir == NONE:
+		ClearBit(LIGHT_COMMAND4)
+	case floor == 1 && dir == UP:
+		ClearBit(LIGHT_UP1)
+	case floor == 2 && dir == UP:
+		ClearBit(LIGHT_UP2)
+	case floor == 3 && dir == UP:
+		ClearBit(LIGHT_UP3)
+	case floor == 2 && dir == DOWN:
+		ClearBit(LIGHT_DOWN2)
+	case floor == 3 && dir == DOWN:
+		ClearBit(LIGHT_DOWN3)
+	case floor == 4 && dir == DOWN:
+		ClearBit(LIGHT_DOWN4)
+	}
+}
+
+func SetMotorDirection(dir Direction) {
+	switch{
+ 	case dir == NONE:
+		WriteAnalog(MOTOR, 0);
+	case dir == UP: 
+		ClearBit(MOTORDIR);
+		WriteAnalog(MOTOR, 2800);
+	case dir == DOWN:
+		SetBit(MOTORDIR);
+		WriteAnalog(MOTOR, 2800);
+	}
+}
+
+func GetObstructionSignal() bool {
+	return ReadBit(STOP)
+}
+
+func GetButtonSignal(buttonType int) bool {
+	return ReadBit(buttonType)
+}
+
+func SortOrders(externalButtonChannel, internalButtonChannel chan int){
+	for{
+		select{
+			case <-internalButtonChannel:
+				elevator.internal_button_array[1] = <- internalButtonChannel
+
+				fmt.Println("MOTTATT ORDRE:")
+		}
+	}
+}
