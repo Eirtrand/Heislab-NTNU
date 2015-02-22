@@ -33,13 +33,17 @@ const (
  var internal_button_array = [NUMBER_OF_INT_BUTTONS] int{
  	BUTTON_COMMAND1, BUTTON_COMMAND2, BUTTON_COMMAND3, BUTTON_COMMAND4,
 }
+ 
+
 
 type elevator struct {
 	state      State
-	external_button_array []int
-	internal_button_array []int
+	externalButtons []int
+	internalButtons []int
 	stop bool
 	obstruction bool
+	currentFloor int
+	prevFloor int
 }
 
 
@@ -51,9 +55,13 @@ func InitializeElevator() int {
 	}
 	externalButtonChannel := make(chan int)
 	internalButtonChannel := make(chan int)
+	floorSensorChannel := make(chan int)
 
-	go PollAllButtons(externalButtonChannel, internalButtonChannel)
-	go SortOrders(externalButtonChannel, internalButtonChannel)
+	elev.externalButtons = make([]int, NUMBER_OF_EXT_BUTTONS)
+	elev.internalButtons = make([]int, NUMBER_OF_INT_BUTTONS)
+
+	go PollAllInputs(floorSensorChannel, externalButtonChannel, internalButtonChannel)
+	go InputHandler(floorSensorChannel, externalButtonChannel, internalButtonChannel)
 	
 	for GetFloorSensorSignal() == 0{
 		SetMotorDirection(DOWN)
@@ -64,7 +72,7 @@ func InitializeElevator() int {
 }
 
 
-func PollAllButtons(internalButtonChannel, externalButtonChannel chan int) {
+func PollAllInputs(floorSensorChannel, internalButtonChannel, externalButtonChannel chan int) {
 	for{
 		for i := 0; i<NUMBER_OF_EXT_BUTTONS; i++{
 			if GetButtonSignal(external_button_array[i]) {
@@ -77,6 +85,9 @@ func PollAllButtons(internalButtonChannel, externalButtonChannel chan int) {
 				internalButtonChannel <- internal_button_array[i]
 				fmt.Println(internal_button_array[i])
 			}
+		}
+		if GetFloorSensorSignal() != 0{
+			floorSensorChannel <- GetFloorSensorSignal()
 		}
 		time.Sleep(time.Millisecond * 18)
 	}	
@@ -175,13 +186,35 @@ func GetButtonSignal(buttonType int) bool {
 	return ReadBit(buttonType)
 }
 
-func SortOrders(externalButtonChannel, internalButtonChannel chan int){
+func InputHandler(floorSensorChannel, externalButtonChannel, internalButtonChannel chan int){
 	for{
 		select{
 			case <-internalButtonChannel:
-				elevator.internal_button_array[1] = <- internalButtonChannel
-
-				fmt.Println("MOTTATT ORDRE:")
+				elev.internalButtons[1] = <- internalButtonChannel
+				fmt.Println("MOTTATT ORDRE:", elev.internalButtons[1])
+	
+			case <-externalButtonChannel:
+				elev.externalButtons[1] = <- externalButtonChannel
+				fmt.Println("MOTTATT ORDRE:", elev.externalButtons[1])
+			case elev.currentFloor <- floorSensorChannel:
+				if elev.currentFloor != elev.prevFloor && elev.currentFloor != 0{
+					
+				}
+				elev.currentFloor = <- floorSensorChannel
+				fmt.Println("currentFloor:", elev.currentFloor)
 		}
+	}
+}
+
+func setFloorLight(floor int){
+	if floor == 0x02{
+		SetBit(LIGHT_FLOOR_IND1)
+	} else{
+		ClearBit(LIGHT_FLOOR_IND1)
+	}
+	if floor == 0x01{
+		SetBit(LIGHT_FLOOR_IND2)
+	} else{
+		ClearBit(LIGHT_FLOOR_IND2)
 	}
 }
