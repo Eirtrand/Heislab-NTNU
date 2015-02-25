@@ -33,8 +33,6 @@ const (
  var internal_button_array = [NUMBER_OF_INT_BUTTONS] int{
  	BUTTON_COMMAND1, BUTTON_COMMAND2, BUTTON_COMMAND3, BUTTON_COMMAND4,
 }
- 
-
 
 type elevator struct {
 	state      State
@@ -44,8 +42,8 @@ type elevator struct {
 	obstruction bool
 	currentFloor int
 	prevFloor int
+	prevDirection Direction
 }
-
 
 func InitializeElevator() int {
 
@@ -53,42 +51,47 @@ func InitializeElevator() int {
 		fmt.Println("init failed")
 		return 0
 	}
+	for GetFloorSensorSignal() == -1{
+		SetMotorDirection(DOWN)
+	}
+
 	externalButtonChannel := make(chan int)
 	internalButtonChannel := make(chan int)
-	floorSensorChannel := make(chan int)
 
 	elev.externalButtons = make([]int, NUMBER_OF_EXT_BUTTONS)
 	elev.internalButtons = make([]int, NUMBER_OF_INT_BUTTONS)
 
-	go PollAllInputs(floorSensorChannel, externalButtonChannel, internalButtonChannel)
-	go InputHandler(floorSensorChannel, externalButtonChannel, internalButtonChannel)
+	go PollAllInputs(internalButtonChannel, externalButtonChannel)
+	go InputHandler(internalButtonChannel, externalButtonChannel)
 	
-	for GetFloorSensorSignal() == 0{
-		SetMotorDirection(DOWN)
-	}
+	
 
 	SetMotorDirection(NONE)
 	return 1
 }
 
 
-func PollAllInputs(floorSensorChannel, internalButtonChannel, externalButtonChannel chan int) {
+func PollAllInputs(internalButtonChannel, externalButtonChannel chan int) {
+
 	for{
 		for i := 0; i<NUMBER_OF_EXT_BUTTONS; i++{
 			if GetButtonSignal(external_button_array[i]) {
-				externalButtonChannel <- external_button_array[i]
+				externalButtonChannel <- i
 				fmt.Println(external_button_array[i])
+				fmt.Println("button uo:", BUTTON_UP1)
 			}
 		}
 		for i := 0; i<NUMBER_OF_INT_BUTTONS; i++{
 			if GetButtonSignal(internal_button_array[i]) {
-				internalButtonChannel <- internal_button_array[i]
-				fmt.Println(internal_button_array[i])
+				internalButtonChannel <- i
+				fmt.Println("sendt",i+1)
 			}
 		}
-		if GetFloorSensorSignal() != 0{
-			floorSensorChannel <- GetFloorSensorSignal()
+		elev.currentFloor = GetFloorSensorSignal()
+		if elev.currentFloor != -1 {
+			elev.prevFloor = elev.currentFloor	
 		}
+
 		time.Sleep(time.Millisecond * 18)
 	}	
 }
@@ -103,7 +106,7 @@ func GetFloorSensorSignal() int{
 	} else if ReadBit(SENSOR_FLOOR4) {
 		return 4
 	} else {
-		return 0
+		return -1
 	}
 }
 
@@ -186,22 +189,17 @@ func GetButtonSignal(buttonType int) bool {
 	return ReadBit(buttonType)
 }
 
-func InputHandler(floorSensorChannel, externalButtonChannel, internalButtonChannel chan int){
+func InputHandler(internalButtonChannel, externalButtonChannel chan int){
 	for{
 		select{
 			case <-internalButtonChannel:
-				elev.internalButtons[1] = <- internalButtonChannel
-				fmt.Println("MOTTATT ORDRE:", elev.internalButtons[1])
+				elev.internalButtons[<- internalButtonChannel] =  1
+				fmt.Println("MOTTATT ORDRE:", <- internalButtonChannel)
 	
 			case <-externalButtonChannel:
-				elev.externalButtons[1] = <- externalButtonChannel
-				fmt.Println("MOTTATT ORDRE:", elev.externalButtons[1])
-			case elev.currentFloor <- floorSensorChannel:
-				if elev.currentFloor != elev.prevFloor && elev.currentFloor != 0{
-					
-				}
-				elev.currentFloor = <- floorSensorChannel
-				fmt.Println("currentFloor:", elev.currentFloor)
+				elev.externalButtons[<- externalButtonChannel] = 1
+				fmt.Println("MOTTATT ORDRE:", <- externalButtonChannel)
+
 		}
 	}
 }
@@ -218,3 +216,74 @@ func setFloorLight(floor int){
 		ClearBit(LIGHT_FLOOR_IND2)
 	}
 }
+
+func PrintElev() {
+	fmt.Println("STATE: ", elev.state)
+
+
+
+	fmt.Println("EXTERNAL BUTTONS")
+	if(elev.externalButtons[5] == 1){
+		fmt.Println("[O]")
+	}else {
+		fmt.Println("[ ]")
+    }
+
+	if(elev.externalButtons[4] == 1){
+		fmt.Print("[O]")
+	}else {
+		fmt.Print("[ ]")
+    }
+
+	if(elev.externalButtons[2] == 1){
+		fmt.Println("[O]")
+	}else {
+		fmt.Println("[ ]")
+    }
+
+	if(elev.externalButtons[3] == 1){
+		fmt.Print("[O]")
+	}else {
+		fmt.Print("[ ]")
+    }
+
+	if(elev.externalButtons[1] == 1){
+		fmt.Println("[O]")
+	}else {
+		fmt.Println("[ ]")
+    }
+
+	if(elev.externalButtons[0] == 1){
+		fmt.Println("   [O]")
+	}else {
+		fmt.Println("   [ ]")
+    }
+
+
+    fmt.Println("INTERNAL BUTTONS")
+    if(elev.internalButtons[0] == 1){
+    		fmt.Print("   [O]	")
+	}else {
+		fmt.Print("   [ ]	")
+    }
+
+    if(elev.internalButtons[1] == 1){
+    		fmt.Print("   [O]	")
+	}else {
+		fmt.Print("   [ ]	")
+    }
+    if(elev.internalButtons[2] == 1){
+    		fmt.Print("   [O]	")
+	}else {
+		fmt.Print("   [ ]	")
+    }
+
+    if(elev.internalButtons[3] == 1){
+    		fmt.Print("   [O]	")
+	}else {
+		fmt.Print("   [ ]	")
+    }
+
+	
+}
+

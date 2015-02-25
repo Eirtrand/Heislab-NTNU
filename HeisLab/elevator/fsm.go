@@ -1,18 +1,17 @@
 package elevator
 
 import (
-	"fmt"
-	"../driver"
+	//"fmt"
+
 	"time"
 )
 
 func Fsm() {
-	driver.InitializeElevator()
+	InitializeElevator()
 
 	for{
-		fmt.Println(driver.STOP == 790)
 		time.Sleep(time.Millisecond * 18)
-
+		PrintElev()
 	}
 
 }
